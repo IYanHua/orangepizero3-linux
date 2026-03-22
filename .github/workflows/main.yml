@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bc bison unzip flex libssl-dev \
-             libelf-dev libncurses5-dev curl cpio rsync gcc-aarch64-linux-gnu wget xz-utils tar
+             libelf-dev libncurses5-dev curl cpio rsync gcc-aarch64-linux-gnu wget xz-utils tar device-tree-compiler
 
       - name: 默认配置(ARCH=arm64)
         run: |
