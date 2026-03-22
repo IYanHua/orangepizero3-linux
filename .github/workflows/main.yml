@@ -1,0 +1,66 @@
+name: Build Linux Kernel v6.18.19 for aarch64
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout workflow repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies and cross toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison unzip flex libssl-dev \
+             libelf-dev libncurses5-dev curl cpio rsync gcc-aarch64-linux-gnu wget xz-utils tar
+
+      - name: Clone Linux Kernel v6.18.19 version
+        run: |
+          wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.19.tar.xz
+          xz -d linux-6.18.19.tar.xz
+          tar -xvf linux-6.18.19.tar
+          mv linux-6.18.19 linux
+          rm -rf linux-6.18.19.tar
+      - name: 转移zip
+        run: |
+          mv opti.zip linux/
+      - name: 解压配置
+        run: |
+          cd linux/
+          unzip -o opti.zip
+          find . -type f -exec touch {} \;
+      - name: Build kernel and modules (ARCH=arm64)
+        run: |
+          cd linux
+          make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all modules V=1
+      - name: Install modules to lib/modules (ARCH=arm64)
+        run: |
+          cd linux
+          INSTALL_MOD_PATH=$PWD/../modules-out make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_install
+      - name: Archive for artifacts
+        run: |
+          mkdir artifact-out
+          cp linux/arch/arm64/boot/Image artifact-out/
+          cp linux/.config artifact-out/
+          cp linux/System.map artifact-out/
+          cp linux/vmlinux artifact-out/
+          cp -r modules-out/lib artifact-out/
+          tar czf linux-arm64-artifacts.tar.gz -C artifact-out/ .
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-v6.19-aarch64-artifacts
+          path: linux-arm64-artifacts.tar.gz
+
+      # 可选 自动 Release
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Linux Kernel v6.18.19 aarch64 Build ${{ github.run_number }}
+          tag_name: linux-v6.18.19-arm64-build-${{ github.run_number }}
+          files: linux-arm64-artifacts.tar.gz
+
