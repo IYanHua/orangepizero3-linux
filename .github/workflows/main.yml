@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - new_fork
 
 jobs:
   build-arm64:
@@ -21,8 +21,7 @@ jobs:
 
       - name: 默认配置(ARCH=arm64)
         run: |
-          mv defconfig .config
-          make ARCH=arm64 olddefconfig
+          # make ARCH=arm64 olddefconfig
       - name: 构建内核与模块 (ARCH=arm64)
         run: |
           make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- all modules V=1
