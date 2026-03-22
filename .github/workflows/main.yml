@@ -32,12 +32,12 @@ jobs:
       - name: 打包tar.gz
         run: |
           mkdir artifact-out
-          cp linux/arch/arm64/boot/Image artifact-out/
-          cp linux/.config artifact-out/
-          cp linux/System.map artifact-out/
-          cp linux/vmlinux artifact-out/
-          cp -r modules-out/ artifact-out/
-          tar czf linux-arm64-artifacts.tar.gz -C artifact-out/ .
+          cp arch/arm64/boot/Image artifact-out/
+          cp .config artifact-out/
+          cp System.map artifact-out/
+          cp vmlinux artifact-out/
+          mv modules-out/* artifact-out/
+          tar czf linux-arm64-artifacts.tar.gz -C artifact-out .
       - name: 上传打包
         uses: actions/upload-artifact@v4
         with:
