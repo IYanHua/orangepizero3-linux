@@ -40,7 +40,7 @@ jobs:
       - name: 上传打包
         uses: actions/upload-artifact@v4
         with:
-          name: linux-aarch64-artifacts
+          name: linux-aarch64-artifacts-2
           path: linux-arm64-artifacts.tar.gz
       - name: 发布
         if: github.ref == 'refs/heads/main'
