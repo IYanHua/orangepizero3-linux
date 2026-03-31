@@ -3034,3 +3034,9 @@ COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
 	return 0;
 }
 #endif /* CONFIG_COMPAT */
+SYSCALL_DEFINE1(foo, int, input)
+{
+        pr_info("foo syscall called with input: %d\n", input);
+            return input * 2;
+}
+
